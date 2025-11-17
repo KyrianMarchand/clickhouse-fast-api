@@ -1,25 +1,16 @@
+import os
 import clickhouse_connect
+from dotenv import load_dotenv
 
-from app.config import settings
+load_dotenv()
 
-class ClickHouseClient:
-    def __init__(self):
-        self.client = None
-    
-    def get_client(self):
-        if not self.client:
-            self.client = clickhouse_connect.get_client(
-                host=settings.clickhouse_host,
-                port=settings.clickhouse_port,
-                username=settings.clickhouse_user,
-                password=settings.clickhouse_password,
-                database=settings.clickhouse_database
-            )
-        return self.client
-    
-    def disconnect(self):
-        if self.client:
-            self.client.close()
-            self.client = None
+CLICKHOUSE_CONFIG = {
+    "host": os.getenv("CLICKHOUSE_HOST", "localhost"),
+    "port": int(os.getenv("CLICKHOUSE_PORT", "8123")),
+    "username": os.getenv("CLICKHOUSE_USER", "default"),
+    "password": os.getenv("CLICKHOUSE_PASSWORD", ""),
+    "database": os.getenv("CLICKHOUSE_DATABASE", "default")
+}
 
-clickhouse_client = ClickHouseClient()
+def get_clickhouse_client():
+    return clickhouse_connect.get_client(**CLICKHOUSE_CONFIG)

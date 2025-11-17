@@ -1,14 +1,9 @@
 from fastapi import FastAPI
-from contextlib import asynccontextmanager
+from app.routers import test, concurrent, deals
 
-from app.database import clickhouse_client
-from app.routers import test
+app = FastAPI()
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    yield
-    clickhouse_client.disconnect()
+app.include_router(test.router)
+app.include_router(concurrent.router)
+app.include_router(deals.router)
 
-app = FastAPI(title="ClickHouse FastAPI", lifespan=lifespan)
-
-app.include_router(test.router, tags=["test"])
